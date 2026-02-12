@@ -1,0 +1,5 @@
+1 = add two numbers
+2 = multiply two numbers  
+3 = take input from user
+4 = print output
+99 = stop
