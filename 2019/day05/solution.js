@@ -8,8 +8,10 @@ function parseInput(filename) {
 function getParamValue(program, position, mode) {
   const value = program[position];
   if (mode === 0) {
+    // Position mode
     return program[value];
   } else {
+    // Immediate mode
     return value;
   }
 }
@@ -22,7 +24,9 @@ function runIntcode(program, input) {
   while (true) {
     const instruction = memory[ip];
     const opcode = instruction % 100;
+    // Hundreds digit
     const mode1 = Math.floor(instruction / 100) % 10;
+    // Thousands digit
     const mode2 = Math.floor(instruction / 1000) % 10;
 
     if (opcode === 99) break;
@@ -47,6 +51,42 @@ function runIntcode(program, input) {
       const param1 = getParamValue(memory, ip + 1, mode1);
       outputs.push(param1);
       ip += 2;
+    } else if (opcode === 5) {
+      const param1 = getParamValue(memory, ip + 1, mode1);
+      const param2 = getParamValue(memory, ip + 2, mode2);
+      if (param1 != 0) {
+        ip = param2;
+      } else {
+        ip += 3;
+      }
+    } else if (opcode === 6) {
+      const param1 = getParamValue(memory, ip + 1, mode1);
+      const param2 = getParamValue(memory, ip + 2, mode2);
+      if (param1 == 0) {
+        ip = param2;
+      } else {
+        ip += 3;
+      }
+    } else if (opcode === 7) {
+      const param1 = getParamValue(memory, ip + 1, mode1);
+      const param2 = getParamValue(memory, ip + 2, mode2);
+      const param3 = getParamValue(memory, ip + 3, 1);
+      if (param1 < param2) {
+        memory[param3] = 1;
+      } else {
+        memory[param3] = 0;
+      }
+      ip += 4;
+    } else if (opcode === 8) {
+      const param1 = getParamValue(memory, ip + 1, mode1);
+      const param2 = getParamValue(memory, ip + 2, mode2);
+      const param3 = getParamValue(memory, ip + 3, 1);
+      if (param1 == param2) {
+        memory[param3] = 1;
+      } else {
+        memory[param3] = 0;
+      }
+      ip += 4;
     } else {
       throw new Error(`Unknown opcode: ${opcode} at position ${ip}`);
     }
@@ -57,7 +97,7 @@ function runIntcode(program, input) {
 
 const path = require("path");
 const program = parseInput(path.join(__dirname, "input.txt"));
-const outputs = runIntcode(program, 1);
+const outputs = runIntcode(program, 5);
 
 console.log("Outputs:", outputs);
 
